@@ -44,6 +44,10 @@ class Advertising(commands.Cog):
             if("Choises" in question):
                 embed_q.add_field(name="Choises",value=f'`{", ".join(question["Choises"]) if "Choises" in question else "Anything"}`')
 
+            if("Format" in question):
+                embed_q.add_field(name="Format",value=f'`{", ".join(question["Format"]) if "Format" in question else "Anything"}`')
+
+
             await ctx.author.send(embed=embed_q)
             
             try:
