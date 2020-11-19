@@ -45,7 +45,7 @@ class Advertising(commands.Cog):
                 embed_q.add_field(name="Choises",value=f'`{", ".join(question["Choises"]) if "Choises" in question else "Anything"}`')
 
             if("Format" in question):
-                embed_q.add_field(name="Format",value=f'`{", ".join(question["Format"]) if "Format" in question else "Anything"}`')
+                embed_q.add_field(name="Format",value=f'`{question["Format"] if "Format" in question else "Anything"}`')
 
 
             await ctx.author.send(embed=embed_q)
@@ -80,13 +80,24 @@ class Advertising(commands.Cog):
                         await ctx.send("Must be one of the given choises")
                         await retry()
                 except KeyError:
-                    pass     
+                    pass  
+            elif(question["Format"] == "User"):
+                body_ = {
+                  "usernames": [
+                    value
+                  ],
+                  "excludeBannedUsers": True
+                }
+                r = requests.post("https://users.roblox.com/v1/usernames/users", data=body_)
+                data = r.json()
+                if len(list(data["data"])) == 0:
+                    await ctx.send("Must be a valid roblox user")
+                    await retry()
 
             if(value == None):
                 await retry()
 
             post[question["Name"]] = value
-            print(post)
 
             if(index+1 <= max_index):
                 await Ask(ctx, data, index+1, post, max_index, timeout, check, next_)
@@ -104,8 +115,10 @@ class Advertising(commands.Cog):
 
                 questions_len = len(list(data["Questions"]))
 
+                start_index = 3
+
                 try:
-                    await Ask(ctx, data, 0, {"Author":ctx.author.id}, questions_len-1, next_=post)
+                    await Ask(ctx, data, start_index, {"Author":ctx.author.id}, questions_len-start_index-1, next_=post)
                 except TimeoutError:
                     await ctx.author.send("Thread stopped it took too long")
 
