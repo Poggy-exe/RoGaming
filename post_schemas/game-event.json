@@ -1,9 +1,9 @@
 {
     "Title":"Game invite",
-    "Description":"Create a post for you very cool meetup",
+    "Description":"Hey! Get ready to play with users among the RoGaming Community!\n\n\u200b",
     "Questions":[
-        {"Question":"What game would you like to meet up in?", "Name":"Game","Format":"Text", "Choises":["Bloxburg","Counter Blox","Meep City","Bee Swarm Simulator"]},
-        {"Question":"When will you meet up?","Name":"Date","Format":"Date", "Example":"HH:MM DD/MM/YY"},
+        {"Question":"What game will you be playing?", "Example": "Bloxburg, Counter Blox and so on", "Name":"Game","Format":"Text", "Choises":["Bloxburg","Counter Blox","Meep City","Bee Swarm Simulator"]},
+        {"Question":"When will you play?","Name":"Date","Format":"Date", "Example":"HH:MM DD/MM/YY"},
         {"Question":"How many robux will you reward attendees?","Name":"Reward", "Format":"Number", "Example":"10 ( 0 for none )"},
         {"Question":"What is you roblox username?", "Name":"Username","Format":"User", "Example":"JanuZz011"}
     ]
