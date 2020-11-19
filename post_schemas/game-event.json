@@ -1,6 +1,6 @@
 {
     "Title":"Game invite",
-    "Description":"The schema for creating a game embed fx. What is the name of your game? When? What will you pay? and so on",
+    "Description":"Create a post for you very cool meetup",
     "Questions":[
         {"Question":"What game would you like to meet up in?", "Name":"Game","Format":"Text", "Choises":["Bloxburg","Counter Blox","Meep City","Bee Swarm Simulator"]},
         {"Question":"When will you meet up?","Name":"Date","Format":"Date", "Example":"HH:MM DD/MM/YY"},

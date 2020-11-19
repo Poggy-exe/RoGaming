@@ -32,7 +32,19 @@ class Advertising(commands.Cog):
             retry = lambda: Ask(ctx,data, index, post, max_index,timeout,check, next_)
 
             question = list(data["Questions"])[index]
-            await ctx.author.send(question["Question"])
+
+            embed_q = discord.Embed(title = data["Title"], description=data["Description"])
+            embed_q.add_field(name="Question", value=f"`{question['Question']}`")
+            
+            #print("Choises" in question)
+
+            if("Example" in question):
+                embed_q.add_field(name="Example",value= f'`{question["Example"] if "Example" in question else "None provided"}`')
+                
+            if("Choises" in question):
+                embed_q.add_field(name="Choises",value=f'`{", ".join(question["Choises"]) if "Choises" in question else "Anything"}`')
+
+            await ctx.author.send(embed=embed_q)
             
             try:
                 answer = await self.client.wait_for("message", check=Check, timeout=60)
@@ -47,20 +59,21 @@ class Advertising(commands.Cog):
                 except ValueError:
                     await retry()
                 if(value < 0):
-                    print(value)
-                    print(type(value))
+                    await ctx.send("Must be a number (1,2,3... not 4.2 or 6.9)")
                     await retry()
             elif(question["Format"] == "Date"):
                 try:
-                    value = datetime.timestamp(datetime.strptime(value, "%H:%M %d/%m/%y").date())
+                    value = datetime.timestamp(datetime.strptime(value, "%H:%M %d/%m/%y"))
                     print(value)
                 except ValueError:
+                    await ctx.send("Must be a date in the format 'HH:MM dd/mm/yy'")
                     await retry()
             elif(question["Format"] == "Text"):
                 try:
                     if(value.title() in question["Choises"]):
                         pass
                     else:
+                        await ctx.send("Must be one of the given choises")
                         await retry()
                 except KeyError:
                     pass     
@@ -88,7 +101,7 @@ class Advertising(commands.Cog):
                 questions_len = len(list(data["Questions"]))
 
                 try:
-                    await Ask(ctx, data, 0, {}, questions_len-1, next_=post)
+                    await Ask(ctx, data, 0, {"Author":ctx.author.id}, questions_len-1, next_=post)
                 except TimeoutError:
                     await ctx.author.send("Thread stopped it took too long")
 
