@@ -4,6 +4,7 @@ import json
 import requests
 from datetime import datetime
 from secrets import * 
+from random import randint
 
 class Advertising(commands.Cog):
     def __init__(self, client):
@@ -35,7 +36,8 @@ class Advertising(commands.Cog):
 
             embed_q = discord.Embed(title = data["Title"], description=data["Description"])
             embed_q.add_field(name="Question", value=f"`{question['Question']}`")
-            
+            embed_q.color = randint(0, 0xffffff)
+
             #print("Choises" in question)
 
             if("Example" in question):
@@ -53,7 +55,7 @@ class Advertising(commands.Cog):
             try:
                 answer = await self.client.wait_for("message", check=Check, timeout=60)
             except TimeoutError:
-                await ctx.send("Thread closed due to timeout")
+                await ctx.author.send("Thread closed due to timeout")
             
             value = answer.content
 
@@ -63,21 +65,21 @@ class Advertising(commands.Cog):
                 except ValueError:
                     await retry()
                 if(value < 0):
-                    await ctx.send("Must be a number (1,2,3... not 4.2 or 6.9)")
+                    await ctx.author.send("Must be a number (1,2,3... not 4.2 or 6.9)")
                     await retry()
             elif(question["Format"] == "Date"):
                 try:
                     value = datetime.timestamp(datetime.strptime(value, "%H:%M %d/%m/%y"))
                     print(value)
                 except ValueError:
-                    await ctx.send("Must be a date in the format 'HH:MM dd/mm/yy'")
+                    await ctx.author.send("Must be a date in the format 'HH:MM dd/mm/yy'")
                     await retry()
             elif(question["Format"] == "Text"):
                 try:
                     if(value.title() in question["Choises"]):
                         pass
                     else:
-                        await ctx.send("Must be one of the given choises")
+                        await ctx.author.send("Must be one of the given choises")
                         await retry()
                 except KeyError:
                     pass  
@@ -91,7 +93,7 @@ class Advertising(commands.Cog):
                 r = requests.post("https://users.roblox.com/v1/usernames/users", data=body_)
                 data = r.json()
                 if len(list(data["data"])) == 0:
-                    await ctx.send("Must be a valid roblox user")
+                    await ctx.author.send("Must be a valid roblox user")
                     await retry()
 
             if(value == None):
@@ -104,6 +106,7 @@ class Advertising(commands.Cog):
             else:
                 if(next_):
                     next_(post)
+                    return post
                     
         
         try:
