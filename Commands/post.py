@@ -115,7 +115,7 @@ class Advertising(commands.Cog):
 
                 questions_len = len(list(data["Questions"]))
 
-                start_index = 3
+                start_index = 0
 
                 try:
                     await Ask(ctx, data, start_index, {"Author":ctx.author.id}, questions_len-start_index-1, next_=post)
