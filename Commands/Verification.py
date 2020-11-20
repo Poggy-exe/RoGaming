@@ -39,7 +39,7 @@ class Verification(commands.Cog):
         r = requests.get(f"https://users.roblox.com/v1/users/{user_id}/status")
         if verifyString in r.json()["status"]:
           con = db.dbCon("dbs\\users.db")
-          con.query("INSERT INTO TABLE Links VALUES('{}','{}','{}',{})".format(ctx.author.id, user_id, datetime.datetime.now().timestamp(),0,0))
+          con.query("INSERT INTO TABLE Links VALUES('{}','{}','{}',{},'{}')".format(ctx.author.id, user_id, datetime.datetime.now().timestamp(),0,0))
           
           await ctx.author.send(embed=quickEmbed("roblox account has been linked"))
 
