@@ -4,7 +4,8 @@ from discord.ext.commands import has_permissions, has_role
 import json
 import requests
 from datetime import datetime
-from secrets import * 
+from secrets import *
+import c_libs.rapi
 #from random import randint
 
 class Advertising(commands.Cog):
@@ -27,7 +28,12 @@ class Advertising(commands.Cog):
             return context.author == ctx.author and isinstance(context.channel, discord.channel.DMChannel)
 
         ## The function where you have the information and you post it to the correct channel
-        def post(post : object):
+        async def post(post : object):
+            post_e = discord.Embed(title="Invite to game", description="\nSee the information below to decide if you can make it. If you can, **react to this message with the :memo: reaction.** You will get a message 1 day and **ca.** 1 hour before the event starts\n\n\n", color=discord.Color.from_rgb(254,254,254))
+            for x in range(1,len(list(post))):
+                item = list(post)[x]
+                post_e.add_field(name=item, value=post[item], inline=False)
+            await ctx.author.send(embed=post_e)
             print(post)
 
         async def Ask(ctx, data : object, index : int, post : object, max_index : int,timeout : int = 120, check : callable = Check, next_ : callable = None):
@@ -130,7 +136,7 @@ class Advertising(commands.Cog):
                     await Ask(ctx, data, index+1, post, max_index, timeout, check, next_)
                 else:
                     if(next_):
-                        next_(post)
+                        await next_(post)
                     return post
                     
         
@@ -142,7 +148,7 @@ class Advertising(commands.Cog):
 
                 start_index = 0
 
-                await Ask(ctx, data, start_index, {"Author":ctx.author.id}, questions_len-start_index-1, next_=post)
+                await Ask(ctx, data, start_index, {"Author":ctx.author}, questions_len-start_index-1, next_=post)
 
         except FileNotFoundError:
             await ctx.author.send("The schema for this question could not be found. Please contact a Moderator and show them this message")
@@ -154,10 +160,7 @@ class Advertising(commands.Cog):
         for channel in category.channels:
             await channel.delete()
 
-        with open(self.schema_path, "r") as f:
-            data = json.loads(f.read())
-
-            for game in data["Games"]:
+        for game in rapi.g:
                 channel = await category.create_text_channel(game, overwrites={ctx.guild.default_role : discord.PermissionOverwrite(send_messages=False)})
                
 

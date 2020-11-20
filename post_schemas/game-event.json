@@ -6,6 +6,6 @@
         {"Question":"What game will you be playing?", "Example": "Bloxburg, Counter Blox, and so on", "Name":"Game","Format":"Game"},
         {"Question":"When will you play?","Name":"Date","Format":"Date", "Example":"HH:MM DD/MM/YY"},
         {"Question":"How many robux will you reward attendees?","Name":"Reward", "Format":"Number", "Example":"10 ( 0 for none )"},
-        {"Question":"What is you roblox username?", "Name":"Username","Format":"User", "Example":"JanuZz011"}
+        {"Question":"What is you roblox username?", "Name":"Roblox username","Format":"User", "Example":"JanuZz011"}
     ]
 }
