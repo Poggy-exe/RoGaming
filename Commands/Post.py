@@ -32,7 +32,7 @@ class Advertising(commands.Cog):
         async def Ask(ctx, data : object, index : int, post : object, max_index : int,timeout : int = 120, check : callable = Check, next_ : callable = None):
             
             ## a lambda for sending an embed wihout a title
-            quickEmbed = lambda message: discord.Embed(color=discord.Color.from_rgb(254,254,254)).add_field(name="\u200b",value=message)
+            quickEmbed = lambda message: discord.Embed(description=message,color=discord.Color.from_rgb(254, 254, 254))
             
             ## lambda shortcut for retying the message if the user fails to give the correct informatiom
             retry = lambda: Ask(ctx,data, index, post, max_index,timeout,check, next_)
