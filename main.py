@@ -2,6 +2,9 @@ import discord
 from discord.ext import commands
 from secrets import *
 import os
+import sys
+
+sys.path.append(PATH_TO_LIBS)
 
 client = commands.Bot(command_prefix=PREFIX)
 

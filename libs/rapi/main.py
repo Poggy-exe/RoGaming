@@ -17,12 +17,8 @@ class games():
         for sort in sorts:
             if(sort["name"] == "Popular"):
                 token = sort["token"]
-        games_list = self.getList(token)
-        games_list = games_list["games"]
-        game_names = []
-        for game in games_list:
-            game_names.append(game["name"])
-        return game_names
+        games_list = self.getList(token, Max_rows)
+        return games_list
 
 class user():
     def getUserIdByName(self, name: str):
