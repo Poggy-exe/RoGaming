@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.ext.commands import has_permissions, has_role
 import json
 import requests
 from datetime import datetime
@@ -71,63 +72,66 @@ class Advertising(commands.Cog):
             if(value.lower() == "cancel"):
                 await ctx.author.send(embed=quickEmbed("Thread cancelled"))
                 return
-
-            ## Check if there was any formatting associated with the question like number date or anything like that
-            if(question["Format"] == "Number"):
-                try:
-                    value = int(value)
-                except ValueError:
-                    await retry()
-                if(value < 0):
-                    await ctx.author.send(embed=quickEmbed("Must be a number (1,2,3... not 4.2 or 6.9)"))
-                    await retry()
-            elif(question["Format"] == "Date"):
-                try:
-                    value = datetime.timestamp(datetime.strptime(value, "%H:%M %d/%m/%y"))
-                    print(value)
-                except ValueError:
-                    await ctx.author.send(embed=quickEmbed("Must be a date in the format `HH:MM dd/mm/yy`"))
-                    await retry()
-            elif(question["Format"] == "Text"):
-                try:
-                    if(value.title() in question["Choises"]):
-                        pass
-                    else:
-                        await ctx.author.send(embed=quickEmbed("Must be one of the given choises"))
-                        await retry()
-                except KeyError:
-                    pass  
-            elif(question["Format"] == "User"):
-    
-                ## Ask the roblox api if the user exists
-                body_ = {
-                  "usernames": [
-                    value
-                  ],
-                  "excludeBannedUsers": True
-                }
-                r = requests.post("https://users.roblox.com/v1/usernames/users", data=body_)
-                resp = r.json()
-                if(r.status_code != 200):
-                    await ctx.author.send(embed=quickEmbed(f"Internal server error: {r.status_code}\nPlease try again later"))
-                    return
-                if len(list(resp["data"])) == 0:
-                    await ctx.author.send(embed=quickEmbed("Roblox user not found? Did you type the name correctly?"))
-                    print
-                    await retry()
-
-            if(value == None):
-                await retry()
-
-            post[question["Name"]] = value
-
-            ## If there are more questions do those otherwise return the collected information
-            if(index+1 <= max_index):
-                await Ask(ctx, data, index+1, post, max_index, timeout, check, next_)
             else:
-                if(next_):
-                    next_(post)
-                return post
+                ## Check if there was any formatting associated with the question like number date or anything like that
+                if(question["Format"] == "Number"):
+                    try:
+                        value = int(value)
+                    except ValueError:
+                        await retry()
+                    if(value < 0):
+                        await ctx.author.send(embed=quickEmbed("Must be a number (1,2,3... not 4.2 or 6.9)"))
+                        await retry()
+                elif(question["Format"] == "Game"):
+                    if value.lower() not in data["Games"]:
+                        await ctx.author.send(embed=quickEmbed("Must be a roblox game"))
+                        await retry()
+                elif(question["Format"] == "Date"):
+                    try:
+                        value = datetime.timestamp(datetime.strptime(value, "%H:%M %d/%m/%y"))
+                        print(value)
+                    except ValueError:
+                        await ctx.author.send(embed=quickEmbed("Must be a date in the format `HH:MM dd/mm/yy`"))
+                        await retry()
+                elif(question["Format"] == "Text"):
+                    try:
+                        if(value.title() in question["Choises"]):
+                            pass
+                        else:
+                            await ctx.author.send(embed=quickEmbed("Must be one of the given choises"))
+                            await retry()
+                    except KeyError:
+                        pass  
+                elif(question["Format"] == "User"):
+                
+                    ## Ask the roblox api if the user exists
+                    body_ = {
+                      "usernames": [
+                        value
+                      ],
+                      "excludeBannedUsers": True
+                    }
+                    r = requests.post("https://users.roblox.com/v1/usernames/users", data=body_)
+                    resp = r.json()
+                    if(r.status_code != 200):
+                        await ctx.author.send(embed=quickEmbed(f"Internal server error: {r.status_code}\nPlease try again later"))
+                        return
+                    if len(list(resp["data"])) == 0:
+                        await ctx.author.send(embed=quickEmbed("Roblox user not found? Did you type the name correctly?"))
+                        await retry()
+
+                if(value == None):
+                    await retry()
+
+                post[question["Name"]] = value
+
+                ## If there are more questions do those otherwise return the collected information
+                if(index+1 <= max_index):
+                    await Ask(ctx, data, index+1, post, max_index, timeout, check, next_)
+                else:
+                    if(next_):
+                        next_(post)
+                    return post
                     
         
         try:
@@ -142,6 +146,20 @@ class Advertising(commands.Cog):
 
         except FileNotFoundError:
             await ctx.author.send("The schema for this question could not be found. Please contact a Moderator and show them this message")
+
+    @commands.command()
+    @has_permissions(manage_channels=True)
+    async def cc(self,ctx ,category : discord.CategoryChannel):
+        
+        for channel in category.channels:
+            await channel.delete()
+
+        with open(self.schema_path, "r") as f:
+            data = json.loads(f.read())
+
+            for game in data["Games"]:
+                channel = await category.create_text_channel(game, overwrites={ctx.guild.default_role : discord.PermissionOverwrite(send_messages=False)})
+               
 
 
     ## ____________ Events ____________ ##
