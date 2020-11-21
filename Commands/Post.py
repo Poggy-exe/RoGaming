@@ -6,52 +6,7 @@ import requests
 from datetime import datetime
 from secrets import *
 import custom_module
-
-## ____________ Module to help with roblox api ____________ ##
-
-
-class games():
-    def getSorts(self):
-        r = requests.get("https://games.roblox.com/v1/games/sorts")
-        return r.json()
-
-    def getList(self, sortToken: str, Max_rows: int = 20):
-        r = requests.get(
-            f"https://games.roblox.com/v1/games/list?model.sortToken={sortToken}&model.maxRows={Max_rows}")
-        return r.json()
-
-    def getPopular(self, Max_rows: int = 20):
-        sorts = self.getSorts()["sorts"]
-        token = ""
-        for sort in sorts:
-            if(sort["name"] == "Popular"):
-                token = sort["token"]
-        games_list = self.getList(token, Max_rows)
-        return games_list
-
-
-class user():
-    def getUserIdByName(self, name: str):
-        body = {
-            "usernames": [
-                name
-            ],
-            "excludeBannedUsers": True
-        }
-        r = requests.post("https://users.roblox.com/v1/usernames/users", body)
-        data = r.json()["data"]
-        if(len(list(data)) > 0):
-            return data[0]["id"]
-        else:
-            return 0
-
-    def getStatus(self, userId: str):
-        r = requests.get(f"https://users.roblox.com/v1/users/{userId}/status")
-        data = r.json()
-        if "errors" not in data:
-            return data["status"]
-        else:
-            return data["errors"][0]["message"]
+import time
 
 
 class Advertising(commands.Cog):
@@ -74,12 +29,8 @@ class Advertising(commands.Cog):
 
         # The function where you have the information and you post it to the correct channel
         async def post(post: object):
-            post_e = discord.Embed(title="Invite to game", description="\nSee the information below to decide if you can make it. If you can, **react to this message with the :memo: reaction.** You will get a message 1 day and **ca.** 1 hour before the event starts\n\n\n", color=discord.Color.from_rgb(254, 254, 254))
-            for x in range(1, len(list(post))):
-                item = list(post)[x]
-                post_e.add_field(name=item, value=post[item], inline=False)
-            await ctx.author.send(embed=post_e)
-            print(post)
+                post_E = custom_module.post(post["Author"].id, post["Roblox username"],123123, post["Date"])
+                await ctx.author.send(embed=post_E.getEmbed())
 
         async def Ask(ctx, data: object, index: int, post: object, max_index: int, timeout: int = 120, check: callable = Check, next_: callable = None):
 
@@ -151,11 +102,14 @@ class Advertising(commands.Cog):
                         await retry()
                 elif(question["Format"] == "Date"):
                     try:
-                        value = datetime.timestamp(
-                            datetime.strptime(value, "%H:%M %d/%m/%y"))
-                        print(value)
+                        currTime = datetime.now()
+                        timestamp = datetime.strptime(value + " {}/{}/{}".format(currTime.day, currTime.month,currTime.year), "%H:%M %d/%m/%Y").timestamp()
+                        if(timestamp < currTime.timestamp()):
+                            await ctx.author.send(embed=quickEmbed(f"It has already been {value} please pick a time that has not been"))
+                            await retry()
+                        value = timestamp
                     except ValueError:
-                        await ctx.author.send(embed=quickEmbed("Must be a date in the format `HH:MM dd/mm/yy`"))
+                        await ctx.author.send(embed=quickEmbed("Must be a date in the format `HH:MM`"))
                         await retry()
                 elif(question["Format"] == "Text"):
                     try:
@@ -218,9 +172,9 @@ class Advertising(commands.Cog):
         for channel in category.channels:
             await channel.delete()
 
-        for game in games().getPopular(max_games)["games"]:
-            name = game["name"]
-            channel = await category.create_text_channel(name, overwrites={ctx.guild.default_role: discord.PermissionOverwrite(send_messages=False)})
+        # for game in games().getPopular(max_games)["games"]:
+        #     name = game["name"]
+        #     channel = await category.create_text_channel(name, overwrites={ctx.guild.default_role: discord.PermissionOverwrite(send_messages=False)})
 
     ## ____________ Events ____________ ##
 
