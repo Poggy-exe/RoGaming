@@ -5,6 +5,7 @@ import json
 import requests
 from datetime import datetime
 from secrets import *
+import custom_module
 
 ## ____________ Module to help with roblox api ____________ ##
 
@@ -139,14 +140,14 @@ class Advertising(commands.Cog):
                 elif(question["Format"] == "Game"):
                     if value.lower() not in data["Games"]:
                         await ctx.author.send(embed=quickEmbed("""
-                        
+
                             Input Error
 
                             You're reply was not a valid response to your options.
                             Please give a valid input, e.g. ``Bloxburg``
-                            
+
                             """))
-                        
+
                         await retry()
                 elif(question["Format"] == "Date"):
                     try:
