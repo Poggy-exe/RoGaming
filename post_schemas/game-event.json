@@ -1,12 +1,11 @@
 {
     "Title":"Game invite",
-    "Description":"Hey! Get ready to play with users among the RoGaming Community!\n\n\u200b",
-    "Games":["bloxburg","counter blox","meep city","bee swarm simulator"],
+    "Description":"Hey! Get ready to play with users among the RoGaming Community!\n\u200b",
     "Questions":[
         {"Question":"What game will you be playing?", "Example": "Please refer to the gaming category in our Community Server for game options", "Name":"Game","Format":"Game"},
-        {"Question":"Time of play: ","Name":"Date","Format":"Date", "Example":"Please give a valid format ``HH:MM`` for when you will be starting your play.  \n\n**NOTE:** This time is in the Eastern Standard Timezone (EST), you may not surpass the beginning of your play session after 11:59 PM Today."},
+        {"Question":"\nInformation","Name":"Info","Format":"Text", "Example":"Please type below all the information / description regarding this play session."},
+        {"Question":"Time of play: ","Name":"Date","Format":"Date", "Example":"Please give a valid format HH:MM for when you will be starting your play session  \n\n> **NOTE:** This time is in the Eastern Standard Timezone (EST), you may not surpass the beginning of your play session after 11:59 PM Today."},
         {"Question":"How many robux will you reward attendees?","Name":"Reward", "Format":"Number", "Example":"10 ( 0 for none )"},
         {"Question":"What is you roblox username?", "Name":"Roblox username","Format":"User", "Example":"JanuZz011"}
     ]
-    
 }

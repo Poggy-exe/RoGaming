@@ -1,5 +1,6 @@
 import discord
 import requests
+from datetime import * 
 import json
 
 class games():
@@ -32,21 +33,44 @@ class games():
                     id = game["id"]
 
             return id
+
+    def getImgUrlById(self, id):
+        url = f"https://thumbnails.roblox.com/v1/assets?assetIds={id}&size=768x432&format=Png&isCircular=false"
+        r = requests.get(url)
+        data = r.json()
+        print(data)
+        try:
+            return data["data"][0]["imageUrl"]
+        except:
+            return ""
+
+    def getNameById(self,id):
+        with open("databases\\game.json", "r") as f:
+            data = json.loads(f.read())
+
+            name = ""
+
+            for game in data["games"]:
+                if(id == game["id"]):
+                    return game["name"]
+
+            return name
                     
     def getChannelIdByGameId(self, id):
         if(id == -1):
             return -1
+            print("invalid id was gived")
 
         with open("databases\\game.json", "r") as f:
             data = json.loads(f.read())
 
-            id = -1
+            r_id = -1
 
             for game in data["games"]:
                 if id == game["id"]:
-                    id = game["channel-id"]
+                    r_id = game["channel_id"]
         
-            return id
+            return r_id
 
     def saveToDB(self, game_id, game_name, channel_id, aliases = []):
         with open("databases\\game.json", "r") as f:
@@ -90,16 +114,29 @@ class r_user():
             return data["errors"][0]["message"]
 
 class ad():
-    def __init__(self, discord_id, roblox_name, game_id, timestamp):
-        self.discord_id = discord_id
+    def __init__(self,event_description : str, discord_usr, roblox_name, game_id,timestamp,reward):
+        self.event_description = event_description
+        self.discord_usr = discord_usr
         self.roblox_name = roblox_name
         self.timestamp = timestamp
+        self.game_id = game_id
+        self.reward = reward
 
         self.id = str(round(timestamp)) + "-" + str(game_id)   
 
 
     def getEmbed(self):
+
+        time_str = datetime.fromtimestamp(self.timestamp).strftime("%b %d  %I:%M %p")
         
-        embed = discord.Embed(description="Hi there", color=discord.Color.from_rgb(254,254,254))
+        embed = discord.Embed(title="Play Roblox",desciption=self.discord_usr.mention , color=discord.Color.from_rgb(254,254,254),url="https://www.roblox.com/games/"+str(self.game_id))
+        embed.add_field(name="**__GAME__**", value=games().getNameById(self.game_id),inline=False)
+        embed.add_field(name="**__DESCRIPTION__**",value=self.event_description,inline=False)
+        embed.add_field(name="**__TIME__**",value=time_str,inline=False)
+        embed.add_field(name="**__REWARD__**",value="None; Voluntary" if self.reward == 0 else self.reward,inline=False)
+        embed.add_field(name="**__ROBLOX__**",value=self.roblox_name,inline=False)
+        embed.set_thumbnail(url=self.discord_usr.avatar_url)
+        embed.set_image(url=games().getImgUrlById(self.game_id))
+
 
         return embed

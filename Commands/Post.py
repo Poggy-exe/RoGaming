@@ -32,7 +32,13 @@ class Advertising(commands.Cog):
 
         # The function where you have the information and you post it to the correct channel
         async def post(post: object):
-            post_ad = ad(post["Author"].id, post["Roblox username"], post["Game"], post["Date"])
+            post_ad = ad(post["Info"],post["Author"], post["Roblox username"], post["Game"], post["Date"], post["Reward"])
+            
+            c_id = games().getChannelIdByGameId(post["Game"])
+
+            channel = discord.utils.get(ctx.guild.channels, id=c_id)
+            await channel.send(embed=post_ad.getEmbed())
+
 
         async def Ask(ctx, data: object, index: int, post: object, max_index: int, timeout: int = 120, check: callable = Check, next_: callable = None):
 
@@ -54,11 +60,11 @@ class Advertising(commands.Cog):
             br = "\n"
 
             embed_q.add_field(
-                name=question['Question'], value=f'`{question["Example"] + br if "Example" in question else "None provided"}`', inline=False)
+                name=question['Question'], value=f'\n> {question["Example"] + br if "Example" in question else "None provided"}', inline=False)
 
-            if("Format" in question):
-                embed_q.add_field(
-                    name="Answer must be", value=f'`{question["Choises"] if "Choises" in question else question["Format"] if "Format" in question else "Anything"}`', inline=False)
+            # if("Format" in question):
+            #     embed_q.add_field(
+            #         name="Answer must be", value=f'`{question["Choises"] if "Choises" in question else question["Format"] if "Format" in question else "Anything"}`', inline=False)
 
             embed_q.add_field(
                 name="\u200b", value="\nUse ``cancel`` to end this thread, it will end in 5 minutes.")
@@ -107,9 +113,10 @@ class Advertising(commands.Cog):
                 elif(question["Format"] == "Date"):
                     try:
                         td = datetime.now()
-                        requested_time = datetime.strptime("{} {}/{}/{} +0500".format(value,td.day, td.month, td.year), "%H:%M %d/%m/%Y %z")
+                        requested_time = datetime.strptime("{} {}/{}/{} -0500".format(value,td.day, td.month, td.year), "%H:%M %d/%m/%Y %z")
                         tz = timezone("EST")
                         td = datetime.now(tz)
+                        #print((requested_time - td).total_seconds())
                         if(requested_time.timestamp() < td.timestamp()):
                             await ctx.author.send(embed=quickEmbed(f"It has already been {value} please choose a time that has not been"))
                             await retry()
@@ -157,7 +164,9 @@ class Advertising(commands.Cog):
                 else:
                     if(next_):
                         await next_(post)
-                    return post
+                    return
+                
+            return
 
         try:
             with open(self.schema_path, "r") as f:
