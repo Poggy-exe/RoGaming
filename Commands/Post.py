@@ -9,6 +9,7 @@ from module import *
 import emoji
 import re
 import time
+from pytz import timezone
 
 
 class Advertising(commands.Cog):
@@ -104,8 +105,19 @@ class Advertising(commands.Cog):
                         await retry()
                     value = game_id
                 elif(question["Format"] == "Date"):
-                    
-
+                    try:
+                        td = datetime.now()
+                        requested_time = datetime.strptime("{} {}/{}/{} +0500".format(value,td.day, td.month, td.year), "%H:%M %d/%m/%Y %z")
+                        tz = timezone("EST")
+                        td = datetime.now(tz)
+                        if(requested_time.timestamp() < td.timestamp()):
+                            await ctx.author.send(embed=quickEmbed(f"It has already been {value} please choose a time that has not been"))
+                            await retry()
+                        else:
+                            value = requested_time.timestamp()
+                    except:
+                        await ctx.author.send(embed=quickEmbed("Must be time in format HH:MM"))
+                        await retry()
                 elif(question["Format"] == "Text"):
                     try:
                         if(value.title() in question["Choises"]):
