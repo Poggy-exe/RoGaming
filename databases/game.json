@@ -1,14 +1,188 @@
 {
     "games": [
         {
-            "Name": "",
-            "id": "123",
-            "aliases": [],
-            "channel-id": "123123",
+            "name": "Adopt Me!",
+            "id": 920587237,
+            "aliases": [
+                "adopt me!"
+            ],
+            "channel_id": 780034990544125962,
+            "posts": []
+        },
+        {
+            "name": "All Star Tower Defense",
+            "id": 4996049426,
+            "aliases": [
+                "all star tower defense"
+            ],
+            "channel_id": 780034991627173908,
+            "posts": []
+        },
+        {
+            "name": "\u2694\ufe0fSEASON 2!\u2694\ufe0f Anime Fighting Simulator",
+            "id": 4042427666,
+            "aliases": [
+                "season 2! anime fighting simulator"
+            ],
+            "channel_id": 780034992210182185,
+            "posts": []
+        },
+        {
+            "name": "Welcome to Bloxburg",
+            "id": 185655149,
+            "aliases": [
+                "welcome to bloxburg"
+            ],
+            "channel_id": 780034993287069696,
+            "posts": []
+        },
+        {
+            "name": "Royale\ud83c\udff0High",
+            "id": 735030788,
+            "aliases": [
+                "royalehigh"
+            ],
+            "channel_id": 780034996068941854,
+            "posts": []
+        },
+        {
+            "name": "Brookhaven \ud83c\udfe1RP",
+            "id": 4924922222,
+            "aliases": [
+                "brookhaven rp"
+            ],
+            "channel_id": 780034996823523338,
+            "posts": []
+        },
+        {
+            "name": "Tower of Hell",
+            "id": 1962086868,
+            "aliases": [
+                "tower of hell"
+            ],
+            "channel_id": 780034997322907649,
+            "posts": []
+        },
+        {
+            "name": "Murder Mystery 2",
+            "id": 142823291,
+            "aliases": [
+                "murder mystery 2"
+            ],
+            "channel_id": 780034998409494539,
+            "posts": []
+        },
+        {
+            "name": "\ud83d\udd25 Jailbreak",
+            "id": 606849621,
+            "aliases": [
+                "jailbreak"
+            ],
+            "channel_id": 780034999386243082,
+            "posts": []
+        },
+        {
+            "name": "Arsenal",
+            "id": 286090429,
+            "aliases": [
+                "arsenal"
+            ],
+            "channel_id": 780035000174247996,
+            "posts": []
+        },
+        {
+            "name": "\ud83d\udc99 MeepCity \ud83d\udc99",
+            "id": 370731277,
+            "aliases": [
+                "meepcity"
+            ],
+            "channel_id": 780035000728158229,
+            "posts": []
+        },
+        {
+            "name": "Build A Boat For Treasure",
+            "id": 537413528,
+            "aliases": [
+                "build a boat for treasure"
+            ],
+            "channel_id": 780035001739771914,
+            "posts": []
+        },
+        {
+            "name": "Bee Swarm Simulator",
+            "id": 1537690962,
+            "aliases": [
+                "bee swarm simulator"
+            ],
+            "channel_id": 780035002569457664,
+            "posts": []
+        },
+        {
+            "name": "[\ud83d\udea8 UPDATE 65 \ud83d\udea8] Bubble Gum Simulator",
+            "id": 2512643572,
+            "aliases": [
+                "bubble gum simulator"
+            ],
+            "channel_id": 780035003395866644,
+            "posts": []
+        },
+        {
+            "name": "Islands \ud83c\udfc6 [PVP!]",
+            "id": 4872321990,
+            "aliases": [
+                "islands"
+            ],
+            "channel_id": 780035004309700608,
+            "posts": []
+        },
+        {
+            "name": "A Universal Time  ",
+            "id": 5130598377,
+            "aliases": [
+                "a universal time"
+            ],
+            "channel_id": 780035005216718868,
+            "posts": []
+        },
+        {
+            "name": "[sReEtoK1 + ReYamoK1!] Ro-Ghoul [ALPHA]",
+            "id": 914010731,
+            "aliases": [
+                "ro-ghoul"
+            ],
+            "channel_id": 780035005971562528,
+            "posts": []
+        },
+        {
+            "name": " \ud83d\ude97Mad City",
+            "id": 1224212277,
+            "aliases": [
+                "mad city"
+            ],
+            "channel_id": 780035006956437534,
             "posts": [
-                "123512",
-                "123123"
+                0,
+                0,
+                0
             ]
+        },
+        {
+            "name": "Blox Fruits",
+            "id": 2753915549,
+            "aliases": [
+                "blox fruits"
+            ],
+            "channel_id": 780035007783239720,
+            "posts": []
+        },
+        {
+            "name": "\ud83d\udc76BECOME A BABY! Club Roblox",
+            "id": 3457390032,
+            "aliases": [
+                "become a baby! club roblox"
+            ],
+            "channel_id": 780035008789217280,
+            "posts": []
         }
     ]
 }

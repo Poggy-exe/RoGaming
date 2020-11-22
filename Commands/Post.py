@@ -3,9 +3,11 @@ from discord.ext import commands
 from discord.ext.commands import has_permissions, has_role
 import json
 import requests
-from datetime import datetime
+from datetime import *
 from secrets import *
-import custom_module
+from module import *
+import emoji
+import re
 import time
 
 
@@ -29,8 +31,7 @@ class Advertising(commands.Cog):
 
         # The function where you have the information and you post it to the correct channel
         async def post(post: object):
-                post_E = custom_module.post(post["Author"].id, post["Roblox username"],123123, post["Date"])
-                await ctx.author.send(embed=post_E.getEmbed())
+            post_ad = ad(post["Author"].id, post["Roblox username"], post["Game"], post["Date"])
 
         async def Ask(ctx, data: object, index: int, post: object, max_index: int, timeout: int = 120, check: callable = Check, next_: callable = None):
 
@@ -47,7 +48,6 @@ class Advertising(commands.Cog):
             embed_q = discord.Embed(title=data["Title"] if index == 0 else "", description=data["Description"]
                                     if index == 0 else "", color=discord.Color.from_rgb(254, 254, 254))
 
-            #print("Choises" in question)
 
             # line break variable because you cant write it in f-strings
             br = "\n"
@@ -83,13 +83,15 @@ class Advertising(commands.Cog):
                 if(question["Format"] == "Number"):
                     try:
                         value = int(value)
+                        if(value < 0):
+                            await ctx.author.send(embed=quickEmbed("Must be a number (1,2,3... not 4.2 or 6.9)"))
+                            await retry()
                     except ValueError:
                         await retry()
-                    if(value < 0):
-                        await ctx.author.send(embed=quickEmbed("Must be a number (1,2,3... not 4.2 or 6.9)"))
-                        await retry()
+                    
                 elif(question["Format"] == "Game"):
-                    if value.lower() not in data["Games"]:
+                    game_id = games().getIdByName(value)
+                    if game_id == -1:
                         await ctx.author.send(embed=quickEmbed("""
 
                             Input Error
@@ -100,17 +102,10 @@ class Advertising(commands.Cog):
                             """))
 
                         await retry()
+                    value = game_id
                 elif(question["Format"] == "Date"):
-                    try:
-                        currTime = datetime.now()
-                        timestamp = datetime.strptime(value + " {}/{}/{}".format(currTime.day, currTime.month,currTime.year), "%H:%M %d/%m/%Y").timestamp()
-                        if(timestamp < currTime.timestamp()):
-                            await ctx.author.send(embed=quickEmbed(f"It has already been {value} please pick a time that has not been"))
-                            await retry()
-                        value = timestamp
-                    except ValueError:
-                        await ctx.author.send(embed=quickEmbed("Must be a date in the format `HH:MM`"))
-                        await retry()
+                    
+
                 elif(question["Format"] == "Text"):
                     try:
                         if(value.title() in question["Choises"]):
@@ -172,9 +167,11 @@ class Advertising(commands.Cog):
         for channel in category.channels:
             await channel.delete()
 
-        # for game in games().getPopular(max_games)["games"]:
-        #     name = game["name"]
-        #     channel = await category.create_text_channel(name, overwrites={ctx.guild.default_role: discord.PermissionOverwrite(send_messages=False)})
+        for game in games().getPopular(max_games)["games"]:
+            name = game["name"]
+            channel = await category.create_text_channel(name, overwrites={ctx.guild.default_role: discord.PermissionOverwrite(send_messages=False)})
+            aliases = [re.sub(emoji.get_emoji_regexp(),r"",re.sub(r'\[.*?\]', "", game["name"])).strip().lower()]
+            games().saveToDB(game["placeId"],game["name"],channel.id,aliases)
 
     ## ____________ Events ____________ ##
 

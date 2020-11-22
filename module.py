@@ -22,24 +22,22 @@ class games():
         return games_list
 
     def getIdByName(self, name : str):
-        with open("databases\game.json", "r") as f:
+        with open("databases\\game.json", "r") as f:
             data = json.loads(f.read())
 
             id = -1
 
             for game in data["games"]:
-                if name == game["name"]:
+                if(name.lower() in game["aliases"]):
                     id = game["id"]
-                elif name in game["aliases"]:
-                    id == game["id"]
-        
+
             return id
                     
     def getChannelIdByGameId(self, id):
         if(id == -1):
             return -1
 
-        with open("databases\game.json", "r") as f:
+        with open("databases\\game.json", "r") as f:
             data = json.loads(f.read())
 
             id = -1
@@ -50,7 +48,25 @@ class games():
         
             return id
 
-class user():
+    def saveToDB(self, game_id, game_name, channel_id, aliases = []):
+        with open("databases\\game.json", "r") as f:
+            data = json.loads(f.read())
+            data["games"].append({"name":game_name,"id":game_id,"aliases":aliases,"channel_id":channel_id,"posts":[]})
+        
+        with open("databases\\game.json", "w") as f:
+            json.dump(data, f)
+
+    def add_post(self, game_id, post_id):
+        with open("databases\\game.json", "r") as f:
+            data = json.loads(f.read())
+            for game in data["games"]:
+                if(game["id"] == game_id):
+                    game["posts"].append(post_id)
+                    
+        with open("databases\\game.json", "w") as f:
+            json.dump(data, f)
+
+class r_user():
     def getUserIdByName(self, name: str):
         body = {
             "usernames": [
@@ -73,18 +89,13 @@ class user():
         else:
             return data["errors"][0]["message"]
 
-class post():
+class ad():
     def __init__(self, discord_id, roblox_name, game_id, timestamp):
         self.discord_id = discord_id
         self.roblox_name = roblox_name
-        self.game_id = games
         self.timestamp = timestamp
-        
-        self.game_id = games().getIdByName(roblox_name)
 
-        if(self.game_id != -1):
-            self.id = self.str(timestamp) + "-" + str(game_id)
-    
+        self.id = str(round(timestamp)) + "-" + str(game_id)   
 
 
     def getEmbed(self):
@@ -92,5 +103,3 @@ class post():
         embed = discord.Embed(description="Hi there", color=discord.Color.from_rgb(254,254,254))
 
         return embed
-
-    def getId()

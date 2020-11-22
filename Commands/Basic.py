@@ -7,8 +7,6 @@ class Basic(commands.Cog):
         self.client = client
 
     ## ____________ Commands ____________ ##
-
-    
     
     # Ping Command
     @commands.command()
