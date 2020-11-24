@@ -1,6 +1,6 @@
 {
-    "Title":"Game invite",
-    "Description":"Hey! Get ready to play with users among the RoGaming Community!\n\u200b",
+    "Title":"PLAYING ROBLOX",
+    "Description":"You're moments away from playing with other Gamers among the RoGaming Community!\n\n\u200b",
     "Questions":[
         {"Question":"What game will you be playing?", "Example": "Please refer to the gaming category in our Community Server for game options", "Name":"Game","Format":"Game"},
         {"Question":"\nInformation","Name":"Info","Format":"Text", "Example":"Please type below all the information / description regarding this play session."},

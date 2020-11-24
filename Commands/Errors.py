@@ -1,9 +1,9 @@
 import discord
 from discord.ext import commands
 
-class Advertising(commands.Cog):
+class Errors(commands.Cog):
     def __init__(self, client):
         self.client = client
 
 def setup(client):
-    client.add_cog(Basic(client))
+    client.add_cog(Errors(client))

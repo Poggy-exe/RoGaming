@@ -170,7 +170,7 @@ class ad():
 class posts():
 
     def getDictById(self, id):
-        with open("databases\\post.json", "r") as f:
+        with open("databases\\posts.json", "r") as f:
             data = json.loads(f.read())
 
             for post in data["posts"]:
@@ -179,3 +179,8 @@ class posts():
 
             return {}
 
+    def getPosts(self):
+        with open("databases\\posts.json", "r") as f:
+            data = json.loads(f.read())
+
+            return data["posts"]

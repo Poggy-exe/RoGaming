@@ -42,6 +42,9 @@ class Advertising(commands.Cog):
             c_id = games().getChannelIdByGameId(post["Game"])
 
             channel = discord.utils.get(ctx.guild.channels, id=c_id)
+
+            post_ad.saveToDB()
+
             await channel.send(embed=post_ad.getEmbed())
 
 
@@ -194,6 +197,14 @@ class Advertising(commands.Cog):
             channel = await category.create_text_channel(name, overwrites={ctx.guild.default_role: discord.PermissionOverwrite(send_messages=False)})
             aliases = [re.sub(emoji.get_emoji_regexp(),r"",re.sub(r'\[.*?\]', "", game["name"])).strip().lower()]
             games().saveToDB(game["placeId"],game["name"],channel.id,aliases)
+
+        for post in posts().getPosts():
+            if(post["game_id"]):
+                channel = discord.utils.get(ctx.guild.channels, id=games().getChannelIdByGameId(post["game_id"]))
+                user = self.client.get_user(post["user_id"])
+                print(user)
+                post_E = ad(post["description"],user,post["roblox_usr"],post["game_id"],post["time"],post["reward"])
+                await channel.send(embed=post_E.getEmbed())
 
     @commands.command()
     @has_permissions(manage_channels=True)
