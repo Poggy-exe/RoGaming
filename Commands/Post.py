@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from discord.ext.commands import has_permissions, has_role
+from discord.ext.commands import has_permissions, has_role, guild_only
 import json
 import requests
 from datetime import *
@@ -18,12 +18,17 @@ class Advertising(commands.Cog):
 
         ## ____________ Variables ____________ ##
         self.schema_path = "post_schemas\game-event.json"
+        
+        # a lambda for sending an embed wihout a title
+        self.quickEmbed = lambda message: discord.Embed(
+            description=message, color=discord.Color.from_rgb(254, 254, 254))
 
     ## ____________ Commands ____________ ##
 
     # Command
 
     @commands.command()
+    @guild_only()
     async def post(self, ctx):
 
         # The check to see if the message was sent in the right channel and/or by the same user as the origininal user
@@ -42,9 +47,7 @@ class Advertising(commands.Cog):
 
         async def Ask(ctx, data: object, index: int, post: object, max_index: int, timeout: int = 120, check: callable = Check, next_: callable = None):
 
-            # a lambda for sending an embed wihout a title
-            def quickEmbed(message): return discord.Embed(
-                description=message, color=discord.Color.from_rgb(254, 254, 254))
+            
 
             # lambda shortcut for retying the message if the user fails to give the correct informatiom
             def retry(): return Ask(ctx, data, index, post, max_index, timeout, check, next_)
@@ -76,14 +79,14 @@ class Advertising(commands.Cog):
 
             # DOESN'T WORK error check to see if the user took too long
             if answer == None:
-                await ctx.author.send(embed=quickEmbed("Thread closed due to inactivity"))
+                await ctx.author.send(embed=self.quickEmbed("Thread closed due to inactivity"))
                 return
 
             value = answer.content
 
             # Check if the user cancelled the thread
             if(value.lower() == "cancel"):
-                await ctx.author.send(embed=quickEmbed("Thread cancelled"))
+                await ctx.author.send(embed=self.quickEmbed("Thread cancelled"))
                 return
             else:
                 # Check if there was any formatting associated with the question like number date or anything like that
@@ -91,7 +94,7 @@ class Advertising(commands.Cog):
                     try:
                         value = int(value)
                         if(value < 0):
-                            await ctx.author.send(embed=quickEmbed("Must be a number (1,2,3... not 4.2 or 6.9)"))
+                            await ctx.author.send(embed=self.quickEmbed("Must be a number (1,2,3... not 4.2 or 6.9)"))
                             await retry()
                     except ValueError:
                         await retry()
@@ -99,7 +102,7 @@ class Advertising(commands.Cog):
                 elif(question["Format"] == "Game"):
                     game_id = games().getIdByName(value)
                     if game_id == -1:
-                        await ctx.author.send(embed=quickEmbed("""
+                        await ctx.author.send(embed=self.quickEmbed("""
 
                             Input Error
 
@@ -112,25 +115,24 @@ class Advertising(commands.Cog):
                     value = game_id
                 elif(question["Format"] == "Date"):
                     try:
-                        td = datetime.now()
-                        requested_time = datetime.strptime("{} {}/{}/{} -0500".format(value,td.day, td.month, td.year), "%H:%M %d/%m/%Y %z")
-                        tz = timezone("EST")
-                        td = datetime.now(tz)
-                        #print((requested_time - td).total_seconds())
-                        if(requested_time.timestamp() < td.timestamp()):
-                            await ctx.author.send(embed=quickEmbed(f"It has already been {value} please choose a time that has not been"))
-                            await retry()
+                        curr_time = datetime.utcnow()
+                        time_str = value + curr_time.strftime(" %d/%m/%Y") + " UTC"
+                        time_ob = datetime.strptime(time_str, "%H:%M %d/%m/%Y %Z")
+                        print(time_ob.timestamp())
+                        if curr_time.timestamp() < time_ob.timestamp():
+                            value = time_ob.timestamp()
                         else:
-                            value = requested_time.timestamp()
-                    except:
-                        await ctx.author.send(embed=quickEmbed("Must be time in format HH:MM"))
+                            await ctx.author.send(embed=self.quickEmbed(f"It has already been {value} please choose a time that has not been. Later than {curr_time.hour}:{curr_time.minute}"))
+                            await retry()
+                    except :
+                        await ctx.author.send(embed=self.quickEmbed("Must be time in format HH:MM"))
                         await retry()
                 elif(question["Format"] == "Text"):
                     try:
                         if(value.title() in question["Choises"]):
                             pass
                         else:
-                            await ctx.author.send(embed=quickEmbed("Must be one of the given choises"))
+                            await ctx.author.send(embed=self.quickEmbed("Must be one of the given choises"))
                             await retry()
                     except KeyError:
                         pass
@@ -147,10 +149,10 @@ class Advertising(commands.Cog):
                         "https://users.roblox.com/v1/usernames/users", data=body_)
                     resp = r.json()
                     if(r.status_code != 200):
-                        await ctx.author.send(embed=quickEmbed(f"Internal server error: {r.status_code}\nPlease try again later"))
+                        await ctx.author.send(embed=self.quickEmbed(f"Internal server error: {r.status_code}\nPlease try again later"))
                         return
                     if len(list(resp["data"])) == 0:
-                        await ctx.author.send(embed=quickEmbed("Roblox user not found? Did you type the name correctly?"))
+                        await ctx.author.send(embed=self.quickEmbed("Roblox user not found? Did you type the name correctly?"))
                         await retry()
 
                 if(value == None):
@@ -165,8 +167,7 @@ class Advertising(commands.Cog):
                     if(next_):
                         await next_(post)
                     return
-                
-            return
+                return
 
         try:
             with open(self.schema_path, "r") as f:
@@ -193,6 +194,11 @@ class Advertising(commands.Cog):
             channel = await category.create_text_channel(name, overwrites={ctx.guild.default_role: discord.PermissionOverwrite(send_messages=False)})
             aliases = [re.sub(emoji.get_emoji_regexp(),r"",re.sub(r'\[.*?\]', "", game["name"])).strip().lower()]
             games().saveToDB(game["placeId"],game["name"],channel.id,aliases)
+
+    @commands.command()
+    @has_permissions(manage_channels=True)
+    async def alias(self, ctx, channel: discord.TextChannel, *, alias):
+        await ctx.send(embed=self.quickEmbed(games().addAliasWithChnId(channel,alias)))
 
     ## ____________ Events ____________ ##
 

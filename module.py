@@ -55,7 +55,23 @@ class games():
                     return game["name"]
 
             return name
-                    
+
+    def addAliasWithChnId(self, channel_id, alias):
+        with open("databases\\game.json", "r") as f:
+            data = json.loads(f.read())
+            
+            message = "Alias already in list"
+
+            for game in data["games"]:
+                if(game["channel_id"] == channel_id.id):
+                    if(alias not in game["aliases"]):
+                        game["aliases"].append(alias)
+                        message =  "Alias added"
+
+        with open("databases\\game.json", "w") as f:
+            json.dump(data, f)
+            return message
+
     def getChannelIdByGameId(self, id):
         if(id == -1):
             return -1
@@ -129,14 +145,37 @@ class ad():
 
         time_str = datetime.fromtimestamp(self.timestamp).strftime("%b %d  %I:%M %p")
         
-        embed = discord.Embed(title="Play Roblox",desciption=self.discord_usr.mention , color=discord.Color.from_rgb(254,254,254),url="https://www.roblox.com/games/"+str(self.game_id))
+        embed = discord.Embed(title="Play Roblox" , color=discord.Color.from_rgb(254,254,254),url="https://www.roblox.com/games/"+str(self.game_id))
         embed.add_field(name="**__GAME__**", value=games().getNameById(self.game_id),inline=False)
         embed.add_field(name="**__DESCRIPTION__**",value=self.event_description,inline=False)
         embed.add_field(name="**__TIME__**",value=time_str,inline=False)
         embed.add_field(name="**__REWARD__**",value="None; Voluntary" if self.reward == 0 else self.reward,inline=False)
         embed.add_field(name="**__ROBLOX__**",value=self.roblox_name,inline=False)
+        embed.add_field(name="**__DISCORD__**", value=self.discord_usr.mention,inline=False)
         embed.set_thumbnail(url=self.discord_usr.avatar_url)
         embed.set_image(url=games().getImgUrlById(self.game_id))
 
 
         return embed
+
+    def saveToDB(self):
+        with open("databases\\posts.json", "r") as f:
+            data = json.loads(f.read())
+            data["posts"].append({"roblox_usr":self.roblox_name,"user_id":self.discord_usr.id,"game_id":self.game_id,"post_id":self.id,"time":self.timestamp,"reward":self.reward,"description":self.event_description})
+        
+        with open("databases\\posts.json", "w") as f:
+            json.dump(data, f)
+
+
+class posts():
+
+    def getDictById(self, id):
+        with open("databases\\post.json", "r") as f:
+            data = json.loads(f.read())
+
+            for post in data["posts"]:
+                if(id == post["id"]):
+                    return post
+
+            return {}
+
