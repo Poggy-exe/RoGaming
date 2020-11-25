@@ -18,7 +18,7 @@ class Advertising(commands.Cog):
 
         ## ____________ Variables ____________ ##
         self.schema_path = "post_schemas\game-event.json"
-        
+
         # a lambda for sending an embed wihout a title
         self.quickEmbed = lambda message: discord.Embed(
             description=message, color=discord.Color.from_rgb(254, 254, 254))
@@ -37,8 +37,9 @@ class Advertising(commands.Cog):
 
         # The function where you have the information and you post it to the correct channel
         async def post(post: object):
-            post_ad = ad(post["Info"],post["Author"], post["Roblox username"], post["Game"], post["Date"], post["Reward"])
-            
+            post_ad = ad(post["Info"], post["Author"], post["Roblox username"],
+                         post["Game"], post["Date"], post["Reward"])
+
             c_id = games().getChannelIdByGameId(post["Game"])
 
             channel = discord.utils.get(ctx.guild.channels, id=c_id)
@@ -47,10 +48,7 @@ class Advertising(commands.Cog):
 
             await channel.send(embed=post_ad.getEmbed())
 
-
         async def Ask(ctx, data: object, index: int, post: object, max_index: int, timeout: int = 120, check: callable = Check, next_: callable = None):
-
-            
 
             # lambda shortcut for retying the message if the user fails to give the correct informatiom
             def retry(): return Ask(ctx, data, index, post, max_index, timeout, check, next_)
@@ -60,7 +58,6 @@ class Advertising(commands.Cog):
             # The main embed where the question is asked
             embed_q = discord.Embed(title=data["Title"] if index == 0 else "", description=data["Description"]
                                     if index == 0 else "", color=discord.Color.from_rgb(254, 254, 254))
-
 
             # line break variable because you cant write it in f-strings
             br = "\n"
@@ -101,7 +98,7 @@ class Advertising(commands.Cog):
                             await retry()
                     except ValueError:
                         await retry()
-                    
+
                 elif(question["Format"] == "Game"):
                     game_id = games().getIdByName(value)
                     if game_id == -1:
@@ -119,15 +116,17 @@ class Advertising(commands.Cog):
                 elif(question["Format"] == "Date"):
                     try:
                         curr_time = datetime.utcnow()
-                        time_str = value + curr_time.strftime(" %d/%m/%Y") + " UTC"
-                        time_ob = datetime.strptime(time_str, "%H:%M %d/%m/%Y %Z")
+                        time_str = value + \
+                            curr_time.strftime(" %d/%m/%Y") + " UTC"
+                        time_ob = datetime.strptime(
+                            time_str, "%H:%M %d/%m/%Y %Z")
                         print(time_ob.timestamp())
                         if curr_time.timestamp() < time_ob.timestamp():
                             value = time_ob.timestamp()
                         else:
                             await ctx.author.send(embed=self.quickEmbed(f"It has already been {value} please choose a time that has not been. Later than {curr_time.hour}:{curr_time.minute}"))
                             await retry()
-                    except :
+                    except:
                         await ctx.author.send(embed=self.quickEmbed("Must be time in format HH:MM"))
                         await retry()
                 elif(question["Format"] == "Text"):
@@ -187,6 +186,7 @@ class Advertising(commands.Cog):
 
     @commands.command()
     @has_permissions(manage_channels=True)
+    @guild_only()
     async def cc(self, ctx, category: discord.CategoryChannel, max_games: int = 20):
 
         for channel in category.channels:
@@ -195,21 +195,25 @@ class Advertising(commands.Cog):
         for game in games().getPopular(max_games)["games"]:
             name = game["name"]
             channel = await category.create_text_channel(name, overwrites={ctx.guild.default_role: discord.PermissionOverwrite(send_messages=False)})
-            aliases = [re.sub(emoji.get_emoji_regexp(),r"",re.sub(r'\[.*?\]', "", game["name"])).strip().lower()]
-            games().saveToDB(game["placeId"],game["name"],channel.id,aliases)
+            aliases = [re.sub(emoji.get_emoji_regexp(), r"", re.sub(
+                r'\[.*?\]', "", game["name"])).strip().lower()]
+            games().saveToDB(game["placeId"],
+                             game["name"], channel.id, aliases)
 
         for post in posts().getPosts():
             if(post["game_id"]):
-                channel = discord.utils.get(ctx.guild.channels, id=games().getChannelIdByGameId(post["game_id"]))
+                channel = discord.utils.get(
+                    ctx.guild.channels, id=games().getChannelIdByGameId(post["game_id"]))
                 user = self.client.get_user(post["user_id"])
                 print(user)
-                post_E = ad(post["description"],user,post["roblox_usr"],post["game_id"],post["time"],post["reward"])
+                post_E = ad(post["description"], user, post["roblox_usr"],
+                            post["game_id"], post["time"], post["reward"])
                 await channel.send(embed=post_E.getEmbed())
 
     @commands.command()
     @has_permissions(manage_channels=True)
-    async def alias(self, ctx, channel: discord.TextChannel, *, alias):
-        await ctx.send(embed=self.quickEmbed(games().addAliasWithChnId(channel,alias)))
+    async def add_alias(self, ctx, channel: discord.TextChannel, *, alias):
+        await ctx.send(embed=self.quickEmbed(games().addAliasWithChnId(channel, alias)))
 
     ## ____________ Events ____________ ##
 

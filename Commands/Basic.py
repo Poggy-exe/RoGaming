@@ -12,13 +12,7 @@ class Basic(commands.Cog):
     @commands.command()
     async def ping(self, ctx):
         await ctx.send("Pong!")
-
-    
-    @commands.command()
-    async def whois(self,ctx, user : discord.Member):
-        _embed = discord.Embed(color=discord.Color.from_rgb(254,254,254)).add_field(name="id", value=user.id)
-        await ctx.send(embed=_embed)
-        
+      
 
     ## ____________ Events ____________ ##
 
