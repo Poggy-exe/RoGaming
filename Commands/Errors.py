@@ -7,6 +7,7 @@ class Errors(commands.Cog):
 
     @commands.Cog.listener()
     async def on_command_error(self,ctx,error):
+        print(error)
         if isinstance(error,commands.MissingRequiredArgument):
             await ctx.send("Missing one or more required arguments please use `.help (command)` to see how to use it")
         elif isinstance(error,commands.ArgumentParsingError):
@@ -41,6 +42,8 @@ class Errors(commands.Cog):
             await ctx.send("Role not found")
         elif isinstance(error,commands.TooManyArguments):
             await ctx.send("Too many arguments please use `.help (command)` to see how to use it")
+        elif isinstance(error, TimeoutError):
+            await ctx.send("You took to long to respond. Cancelled")
 
 def setup(client):
     client.add_cog(Errors(client))

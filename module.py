@@ -147,14 +147,12 @@ class ad():
         
         embed = discord.Embed(title="Play Roblox" , color=discord.Color.from_rgb(254,254,254),url="https://www.roblox.com/games/"+str(self.game_id))
         embed.add_field(name="**__GAME__**", value=games().getNameById(self.game_id),inline=False)
-        embed.add_field(name="**__DESCRIPTION__**",value=self.event_description,inline=False)
+        embed.add_field(name="\u200b\n",value=self.event_description,inline=False)
         embed.add_field(name="**__TIME__**",value=time_str,inline=False)
         embed.add_field(name="**__REWARD__**",value="None; Voluntary" if self.reward == 0 else self.reward,inline=False)
-        embed.add_field(name="**__ROBLOX__**",value=self.roblox_name,inline=False)
-        embed.add_field(name="**__DISCORD__**", value=self.discord_usr.mention,inline=False)
+        embed.add_field(name="**__CONTACT__**", value='[{}](https://web.roblox.com/users/{})\n{}'.format(self.roblox_name,r_user().getUserIdByName(self.roblox_name),self.discord_usr.mention),inline=False)
         embed.set_thumbnail(url=self.discord_usr.avatar_url)
         embed.set_image(url=games().getImgUrlById(self.game_id))
-
 
         return embed
 

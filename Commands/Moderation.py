@@ -64,21 +64,5 @@ class Moderation(commands.Cog):
         await user.edit(voice_channel=channel)
         await ctx.send(f"{user} has been moved")
 
-    @commands.command()
-    @guild_only()
-    @has_permissions(manage_roles=True)
-    async def r_add(self, ctx, user : discord.Member, role : discord.Role, *,reason : str = "None provided"):
-        await ctx.message.delete()
-        await user.add_roles(role, reason=reason)
-        await ctx.send(f"{user} has been gived the role {role} for reason: `{reason}`")
-
-    @commands.command()
-    @guild_only()
-    @has_permissions(manage_roles=True)
-    async def r_del(self, ctx, user : discord.Member, role : discord.Role, *,reason : str = "None provided"):
-        await ctx.message.delete()
-        await user.remove_roles(role, reason=reason)
-        await ctx.send(f"{user} has lost the role {role} for reason: `{reason}`")   
-
 def setup(client):
     client.add_cog(Moderation(client))
