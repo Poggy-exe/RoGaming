@@ -3,6 +3,52 @@ import requests
 from datetime import * 
 import json
 
+class user():
+    def __init__(self, id : str):
+        self.id = id
+    
+    def addInfraction(self):
+        data = db("users").getDb()
+        if(data["users"]):
+            for user in data["users"]:
+                if user["id"] == self.id:
+                    try:
+                        user["infractions"] += 1
+                    except:
+                        return False
+            db("users").saveDb(data)
+            return True
+        else:
+            return False
+
+    def setInfractions(self,n):
+        data = db("users").getDb()
+        if(data["users"]):
+            for user in data["users"]:
+                if user["id"] == self.id:
+                    try:
+                        user["infractions"] = n
+                    except:
+                        return False
+            db("users").saveDb(data)
+            return True
+        else:
+            return False
+
+    def setDescription(self, description : str):
+        data = db("users").getDb()
+        if(data["users"]):
+            for user in data["users"]:
+                if user["id"] == self.id:
+                    try:
+                        user["description"] = description
+                    except:
+                        return False
+            db("users").saveDb(data)
+            return True
+        else:
+            return False
+
 class games():
     def getSorts(self):
         r = requests.get("https://games.roblox.com/v1/games/sorts")
@@ -150,7 +196,7 @@ class ad():
         embed.add_field(name="\u200b\n",value=self.event_description,inline=False)
         embed.add_field(name="**__TIME__**",value=time_str,inline=False)
         embed.add_field(name="**__REWARD__**",value="None; Voluntary" if self.reward == 0 else self.reward,inline=False)
-        embed.add_field(name="**__CONTACT__**", value='[{}](https://web.roblox.com/users/{})\n{}'.format(self.roblox_name,r_user().getUserIdByName(self.roblox_name),self.discord_usr.mention),inline=False)
+        embed.add_field(name="**__CONTACT__**", value='[:roblox:{}](https://web.roblox.com/users/{})\n:discord:{}'.format(self.roblox_name,r_user().getUserIdByName(self.roblox_name),self.discord_usr.mention),inline=False)
         embed.set_thumbnail(url=self.discord_usr.avatar_url)
         embed.set_image(url=games().getImgUrlById(self.game_id))
 
@@ -164,7 +210,31 @@ class ad():
         with open("databases\\posts.json", "w") as f:
             json.dump(data, f)
 
+class db():
+    def __init__(self,db : str):
+        self.db = db
+    
+    def saveDb(self,data):
+        try:
+            with open(f"databases\\{self.db}.json", "w") as f:
+                try:
+                    f.write(json.dumps(data))
+                except TypeError:
+                    return False
+                return True
+        except FileNotFoundError:
+            return False
 
+    def getDb(self):
+        try:
+            with open(f"databases\\{self.db}.json", "r") as f:
+                try:
+                    return json.loads(f.read())
+                except TypeError:
+                    return False
+        except FileNotFoundError:
+            return False
+            
 class posts():
 
     def getDictById(self, id):

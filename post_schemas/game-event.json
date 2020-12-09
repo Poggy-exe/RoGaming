@@ -6,6 +6,6 @@
         {"Question":"\nInformation","Name":"Info","Format":"Text", "Example":"Please type below all the information / description regarding this play session."},
         {"Question":"Time of play: ","Name":"Date","Format":"Date", "Example":"Please give a valid format HH:MM for when you will be starting your play session  \n\n> **NOTE:** This time is in the UTC Timezone, you may not surpass the beginning of your play session after 11:59 PM Today."},
         {"Question":"Reward","Name":"Reward", "Example":"How much robux will you be distributing to attendees?\n> Please use ``0`` if this is a voluntary play session to attend.","Format":"Number"},
-        {"Question":"What is you roblox username?", "Name":"Roblox username","Format":"User", "Example":"JanuZz011"}
+        {"Question":"What is you roblox username?", "Name":"Roblox username","Format":"User", "Example":"FlewbyaGaming_YT, Aesth_tix or JanuZz011"}
     ]
 }

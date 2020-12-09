@@ -12,7 +12,7 @@ import time
 from pytz import timezone
 
 
-class Advertising(commands.Cog):
+class Post(commands.Cog):
     def __init__(self, client):
         self.client = client
 
@@ -27,9 +27,9 @@ class Advertising(commands.Cog):
 
     # Command
 
-    @commands.command()
+    @commands.command(name = "play", description = "Start a thread to post you game invite")
     @guild_only()
-    async def post(self, ctx):
+    async def play(self, ctx):
 
         # The check to see if the message was sent in the right channel and/or by the same user as the origininal user
         def Check(context):
@@ -47,6 +47,9 @@ class Advertising(commands.Cog):
             post_ad.saveToDB()
 
             await channel.send(embed=post_ad.getEmbed())
+
+            print("Question posted")
+
 
         async def Ask(ctx, data: object, index: int, post: object, max_index: int, timeout: int = 120, check: callable = Check, next_: callable = None):
 
@@ -70,7 +73,7 @@ class Advertising(commands.Cog):
             #         name="Answer must be", value=f'`{question["Choises"] if "Choises" in question else question["Format"] if "Format" in question else "Anything"}`', inline=False)
 
             embed_q.add_field(
-                name="\u200b", value="\nUse ``cancel`` to end this thread, it will end in 5 minutes.")
+                name="\u200b", value="\nUse ``cancel`` to end this thread, you have 5 minutes to answer this question.")
 
             await ctx.author.send(embed=embed_q)
 
@@ -181,45 +184,9 @@ class Advertising(commands.Cog):
 
                 await Ask(ctx, data, start_index, {"Author": ctx.author}, questions_len-start_index-1, next_=post)
 
+                return
         except FileNotFoundError:
             await ctx.author.send("The schema for this question could not be found. Please contact a Moderator and show them this message")
 
-    @commands.command()
-    @has_permissions(manage_channels=True)
-    @guild_only()
-    async def cc(self, ctx, category: discord.CategoryChannel, max_games: int = 20):
-
-        for channel in category.channels:
-            await channel.delete()
-
-        for game in games().getPopular(max_games)["games"]:
-            name = game["name"]
-            channel = await category.create_text_channel(name, overwrites={ctx.guild.default_role: discord.PermissionOverwrite(send_messages=False)})
-            aliases = [re.sub(emoji.get_emoji_regexp(), r"", re.sub(
-                r'\[.*?\]', "", game["name"])).strip().lower()]
-            games().saveToDB(game["placeId"],
-                             game["name"], channel.id, aliases)
-
-        for post in posts().getPosts():
-            if(post["game_id"]):
-                channel = discord.utils.get(
-                    ctx.guild.channels, id=games().getChannelIdByGameId(post["game_id"]))
-                user = self.client.get_user(post["user_id"])
-                print(user)
-                post_E = ad(post["description"], user, post["roblox_usr"],
-                            post["game_id"], post["time"], post["reward"])
-                await channel.send(embed=post_E.getEmbed())
-
-    @commands.command()
-    @has_permissions(manage_channels=True)
-    async def add_alias(self, ctx, channel: discord.TextChannel, *, alias):
-        await ctx.send(embed=self.quickEmbed(games().addAliasWithChnId(channel, alias)))
-
-    ## ____________ Events ____________ ##
-
-    # Event
-    # @commands.Cog.listener()
-
-
 def setup(client):
-    client.add_cog(Advertising(client))
+    client.add_cog(Post(client))
