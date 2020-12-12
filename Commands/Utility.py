@@ -1,26 +1,31 @@
 import discord
 from discord.ext import commands
 from discord.ext.commands import has_permissions, has_role, guild_only
+from module import *
+import re
+import emoji
 
 class Utility(commands.Cog):
     def __init__(self, client):
         self.client = client
 
-    @commands.command(description="Create the channels")
+    @commands.command(name="cc",description="Create the channels")
     @has_permissions(manage_channels=True)
     @guild_only()
-    async def cc(self, ctx, category: discord.CategoryChannel, max_games: int = 20):
+    async def create_channels(self, ctx, category: discord.CategoryChannel, name_format = "[game]",max_games: int = 20):
 
         for channel in category.channels:
             await channel.delete()
 
         for game in games().getPopular(max_games)["games"]:
-            name = game["name"]
+            name = re.sub(emoji.get_emoji_regexp(), r"", re.sub(r'\[.*?\]', "", game["name"])).strip().lower()
+            print(name)
+            name = name_format.replace("[game]", name)
+            print(name)
+
             channel = await category.create_text_channel(name, overwrites={ctx.guild.default_role: discord.PermissionOverwrite(send_messages=False)})
-            aliases = [re.sub(emoji.get_emoji_regexp(), r"", re.sub(
-                r'\[.*?\]', "", game["name"])).strip().lower()]
-            games().saveToDB(game["placeId"],
-                             game["name"], channel.id, aliases)
+            aliases = [name]            
+            games().saveToDB(game["placeId"],game["name"], channel.id, aliases)
 
         for post in posts().getPosts():
             if(post["game_id"]):
@@ -40,8 +45,6 @@ class Utility(commands.Cog):
     @commands.command(name="announce")
     @guild_only()
     async def send_message_as_embed(self,ctx, channel : discord.TextChannel, *, message : str):
-
-        message = message.replace("\\n","\n")
 
         embed = discord.Embed(color=discord.Color.from_rgb(254,254,254), description=message)
         await channel.send(embed=embed)

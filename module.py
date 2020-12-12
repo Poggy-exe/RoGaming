@@ -1,7 +1,9 @@
 import discord
+from discord.utils import get
 import requests
 from datetime import * 
 import json
+from src import guild_info
 
 class user():
     def __init__(self, id : str):
@@ -176,7 +178,7 @@ class r_user():
             return data["errors"][0]["message"]
 
 class ad():
-    def __init__(self,event_description : str, discord_usr, roblox_name, game_id,timestamp,reward):
+    def __init__(self,event_description : str, discord_usr : discord.User, roblox_name, game_id,timestamp,reward):
         self.event_description = event_description
         self.discord_usr = discord_usr
         self.roblox_name = roblox_name
@@ -252,3 +254,63 @@ class posts():
             data = json.loads(f.read())
 
             return data["posts"]
+
+class ticket():
+    def __init__(self, user, reason):
+        self.reason = reason
+        self.user = user
+        self.id = 0
+
+        data = db("tickets").getDb()["tickets"]
+        max_id = 0
+        for ticket in data:
+            max_id = max(max_id, ticket["id"])
+            if ticket["poster"] == self.user and ticket["reason"] == self.reason:
+                self.id = ticket["id"]
+                break
+        self.id = max_id+1
+
+    def get_json(self):
+        return {"id":self.id, "poster":str(self.user.id), "reason":self.reason}
+
+    def save(self):
+        data = db("tickets").getDb()
+        for t in data["tickets"]:
+            if t["poster"] == str(self.user.id) and t["reason"] == self.reason:
+                return
+        data["tickets"].append(self.get_json())
+        db("tickets").saveDb(data)
+
+    def get_embed(self, ctx):
+        embed = discord.Embed(description="**Reason for support ticket**" + "\n" + self.reason + "\n\n" + guild_info.support_footer.replace("[support]", get(ctx.guild.roles, id=int(guild_info.support)).mention))
+        return embed
+
+    def get_cat(self, ctx):
+        cat = get(ctx.guild.categories, id=int(guild_info.not_claimed_support_category))
+        if cat == None:
+            cat = ctx.guild.categories[0]
+        return cat
+
+    async def get_channel(self,ctx):
+        cat = self.get_cat(ctx)
+        channel_name = f"ticket {self.id}"
+        channel = get(ctx.guild.text_channels, name=channel_name)
+        if channel != None:
+            return channel
+        
+
+        channel = await cat.create_text_channel(channel_name, reason="Channel for a support case")
+        
+        overwrite = discord.PermissionOverwrite()
+        overwrite.send_messages = False
+        overwrite.read_messages = False
+
+        await channel.set_permissions(get(ctx.guild.roles,name="@everyone"), overwrite=overwrite)
+        
+        perms = channel.overwrites_for(self.user)
+        perms.send_messages = True
+        perms.read_messages = True
+
+        await channel.set_permissions(self.user, overwrite=perms)
+        
+        return channel
