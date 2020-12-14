@@ -6,19 +6,6 @@ import json
 import module
 from src import guild_info
 
-
-def syntax(command):
-    aliases = "|".join([str(command), *command.aliases])
-    params = []
-    for key, value in command.params.items():
-        if key not in ("self", "ctx"):
-            params.append(f"[{key}]" if "NoneType" in str(
-                value) else f"<{key}>")
-    params = " ".join(params)
-
-    return f"```{aliases} {params}```"
-
-
 class Support(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -32,17 +19,39 @@ class Support(commands.Cog):
 
         case.save()
 
-        await channel.send(embed = case.get_embed(ctx))
+        msg = await channel.send(embed = case.get_embed(ctx))
+
+        await msg.pin()
 
     @commands.command()
-    async def close(self,ctx,id : int):
+    async def close(self,ctx):
+
+        id = await module.getTicketIdByChannelId(ctx.guild,ctx.message.channel.id)
+
         data = module.db("tickets").getDb()
         for i, t in enumerate(data["tickets"]):
             if t["id"] == id:
                 data["tickets"].pop(i)
                 module.db("tickets").saveDb(data)
-                return
-        await ctx.send("No such ticket exists0")
+                await ctx.send("Ticket closed")
+                await ctx.message.channel.delete(reason="Ticket closed by moderator or user")
+
+    @commands.command()
+    async def claim(self,ctx, name = "claimed ticket"):
+        try:
+             id = await module.getTicketIdByChannelId(ctx.guild,ctx.message.channel.id)
+            
+            data = module.db("tickets").getDb()
+            for i, t in enumerate(data["tickets"]):
+                if t["id"] == id:
+                    data["tickets"][i]["claimed"] = True
+                    module.db("tickets").saveDb(data)
+                    await ctx.message.channel.name = name + f" : {id}"
+                    await ctx.send("Claimed") 
+
+        except:
+            await ctx.send("Must be in a ticket channel")
+            return
 
 def setup(client):
     client.add_cog(Support(client))

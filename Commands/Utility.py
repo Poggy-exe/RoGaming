@@ -13,6 +13,7 @@ class Utility(commands.Cog):
     @has_permissions(manage_channels=True)
     @guild_only()
     async def create_channels(self, ctx, category: discord.CategoryChannel, name_format = "[game]",max_games: int = 20):
+        max_games = min(max_games, 50)
 
         for channel in category.channels:
             await channel.delete()

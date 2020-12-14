@@ -283,10 +283,11 @@ class ticket():
 
     def get_embed(self, ctx):
         embed = discord.Embed(description="**Reason for support ticket**" + "\n" + self.reason + "\n\n" + guild_info.support_footer.replace("[support]", get(ctx.guild.roles, id=int(guild_info.support)).mention))
+        embed.add_field(name="**id**",value=str(self.id))
         return embed
-
+        
     def get_cat(self, ctx):
-        cat = get(ctx.guild.categories, id=int(guild_info.not_claimed_support_category))
+        cat = get(ctx.guild.categories, id=int(guild_info.support_category))
         if cat == None:
             cat = ctx.guild.categories[0]
         return cat
@@ -314,3 +315,14 @@ class ticket():
         await channel.set_permissions(self.user, overwrite=perms)
         
         return channel
+
+async def getTicketIdByChannelId(guild,channel_id):
+    
+    channel = get(guild.channels, id=channel_id)
+    
+    pins = await channel.pins()
+    id_pin = pins[len(pins)-1]
+    id_msg = id_pin.embeds[0].to_dict()
+    id = int(id_msg["fields"][0]["value"])
+    
+    return id

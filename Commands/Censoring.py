@@ -33,6 +33,5 @@ class Filters(commands.Cog):
             with open("src/bad-words.txt", "w") as f:
                 f.write("\n".join(words))
 
-
 def setup(client):
     client.add_cog(Filters(client))

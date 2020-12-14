@@ -3,4 +3,4 @@ command_template.py
 
 /__pycache__
 /Commands/__pycache__
-/dbs/users
+/dbs/users.json

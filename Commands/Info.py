@@ -43,7 +43,8 @@ class Info(commands.Cog):
                                     value=commandLst, inline=False)
             await ctx.send(embed=embed)
         else:
-            if(command := get(self.client.commands, name=cmd)):
+            if(get(self.client.commands, name=cmd)):
+                command = get(self.client.commands, name=cmd)
                 await self.cmd_help(ctx, command)
             else:
                 await ctx.send("Command not found")
