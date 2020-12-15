@@ -10,7 +10,7 @@ class Utility(commands.Cog):
         self.client = client
 
     @commands.command(name="cc",description="Create the channels")
-    @has_permissions(manage_channels=True)
+    @has_permissions(administrator=True)
     @guild_only()
     async def create_channels(self, ctx, category: discord.CategoryChannel, name_format = "[game]",max_games: int = 20):
         max_games = min(max_games, 50)
@@ -39,12 +39,13 @@ class Utility(commands.Cog):
                 await channel.send(embed=post_E.getEmbed())
 
     @commands.command(description="Add an alias for a channel for a game")
-    @has_permissions(manage_channels=True)
+    @has_permissions(administrator=True)
     async def add_alias(self, ctx, channel: discord.TextChannel, *, alias):
         await ctx.send(embed=self.quickEmbed(games().addAliasWithChnId(channel, alias)))
 
     @commands.command(name="announce")
     @guild_only()
+    @has_permissions(manage_guild=True)
     async def send_message_as_embed(self,ctx, channel : discord.TextChannel, *, message : str):
 
         embed = discord.Embed(color=discord.Color.from_rgb(254,254,254), description=message)

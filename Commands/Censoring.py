@@ -1,5 +1,6 @@
 import discord
 from discord.ext import commands
+from discord.ext.commands import has_permissions
 import module
 
 class Filters(commands.Cog):
@@ -19,11 +20,13 @@ class Filters(commands.Cog):
         #await self.client.process_commands(msg)
     
     @commands.command()
+    @has_permissions(administrator=True)
     async def blacklist(self, ctx, word : str):
         with open("src/bad-words.txt", "a+") as f:
             f.write(word + "\n")
 
     @commands.command()
+    @has_permissions(administrator=True)
     async def whitelist(self, ctx, word : str):
         words = []
         with open("src/bad-words.txt", "r") as f:

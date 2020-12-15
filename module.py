@@ -260,6 +260,7 @@ class ticket():
         self.reason = reason
         self.user = user
         self.id = 0
+        self.claimed = False
 
         data = db("tickets").getDb()["tickets"]
         max_id = 0
@@ -271,7 +272,7 @@ class ticket():
         self.id = max_id+1
 
     def get_json(self):
-        return {"id":self.id, "poster":str(self.user.id), "reason":self.reason}
+        return {"id":self.id, "poster":str(self.user.id), "reason":self.reason, "claimed":self.claimed}
 
     def save(self):
         data = db("tickets").getDb()
@@ -282,8 +283,18 @@ class ticket():
         db("tickets").saveDb(data)
 
     def get_embed(self, ctx):
-        embed = discord.Embed(description="**Reason for support ticket**" + "\n" + self.reason + "\n\n" + guild_info.support_footer.replace("[support]", get(ctx.guild.roles, id=int(guild_info.support)).mention))
-        embed.add_field(name="**id**",value=str(self.id))
+        # SUPPORT TICKET
+
+        # Please wait for one of our staff member's to assist you with you're problem. (Pinging is unnecessary)
+        # ID
+        # <ID>
+        # (Footer) Requested by <person who made the ticket>
+
+        embed = discord.Embed(color=discord.Color.from_rgb(254,254,254),title="SUPPORT TICKET", description="Please wait for one of our staff member's to assist you with your problem. (Pinging is unnecessary)")
+        embed.add_field(name="**REASON**", value=self.reason + "\n", inline=False)
+        embed.add_field(name="**ID**",value=str(self.id), inline=False)
+        embed.set_thumbnail(url=ctx.author.avatar_url)
+        embed.set_footer(text="Requested by {}#{}".format(ctx.author.name,ctx.author.discriminator))
         return embed
         
     def get_cat(self, ctx):

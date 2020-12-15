@@ -2,6 +2,7 @@ from typing import Optional
 from discord.utils import get
 import discord
 from discord.ext import commands
+from discord.ext.commands import has_permissions
 import json
 import module
 
@@ -61,7 +62,7 @@ class Info(commands.Cog):
 
         users = module.db("users").getDb()["users"]
         for dbUser in users:
-            if dbUser["id"] == str(ctx.author.id):
+            if dbUser["id"] == str(user.id):
                 userJson = dbUser
 
         if userJson == {}:
@@ -69,11 +70,8 @@ class Info(commands.Cog):
             userJson = {"id": str(
                 ctx.author.id), "description": "No special info about user", "links": [], "infractions": 0}
 
-            userJson["links"] = []
-
-        embed = discord.Embed(color=discord.Color.from_rgb(
-            254, 254, 254), title=f"{user.name}#{user.discriminator}", description=userJson["description"]+"\n",)
-        embed.add_field(name="infractions", value=str(userJson["infractions"]))
+        embed = discord.Embed(color=discord.Color.from_rgb(254, 254, 254), title=f"{user.name}#{user.discriminator}", description=userJson["description"]+"\n",)
+        embed.add_field(name="Infractions", value=str(userJson["infractions"]))
 
         smString = ""
 
