@@ -50,7 +50,6 @@ class Utility(commands.Cog):
 
         embed = discord.Embed(color=discord.Color.from_rgb(254,254,254), description=message)
         await channel.send(embed=embed)
-        await ctx.message.delete()
     ## ____________ Events ____________ ##
 
     # Event
