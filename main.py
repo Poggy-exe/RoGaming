@@ -5,9 +5,7 @@ from secrets import *
 import os
 import sys
 
-sys.path.append(PATH_TO_LIBS)
-
-client = commands.Bot(command_prefix=PREFIX)
+client = commands.Bot(command_prefix=".")
 
 client.remove_command("help")
 
