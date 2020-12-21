@@ -17,7 +17,7 @@ class Post(commands.Cog):
         self.client = client
 
         ## ____________ Variables ____________ ##
-        self.schema_path = "post_schemas\game-event.json"
+        self.schema_path = "post_schemas\\game-event.json"
 
         # a lambda for sending an embed wihout a title
         self.quickEmbed = lambda message: discord.Embed(
@@ -30,6 +30,8 @@ class Post(commands.Cog):
     @commands.command(name = "play", description = "Start a thread to post you game invite")
     @guild_only()
     async def play(self, ctx):
+        def __init__():
+            self.ctx = ctx
 
         # The check to see if the message was sent in the right channel and/or by the same user as the origininal user
         def Check(context):
@@ -40,7 +42,7 @@ class Post(commands.Cog):
             post_ad = ad(post["Info"], post["Author"], post["Roblox username"],
                          post["Game"], post["Date"], post["Reward"])
 
-            c_id = games().getChannelIdByGameId(post["Game"])
+            c_id = games(self.ctx.guild.id).getChannelIdByGameId(post["Game"])
 
             channel = discord.utils.get(ctx.guild.channels, id=c_id)
 
@@ -103,7 +105,7 @@ class Post(commands.Cog):
                         await retry()
 
                 elif(question["Format"] == "Game"):
-                    game_id = games().getIdByName(value)
+                    game_id = games().getIdByName(ctx.guild.id, value)
                     if game_id == -1:
                         await ctx.author.send(embed=self.quickEmbed("""
 
@@ -182,9 +184,11 @@ class Post(commands.Cog):
 
                 start_index = 0
 
-                await Ask(ctx, data, start_index, {"Author": ctx.author}, questions_len-start_index-1, next_=post)
+                try:
+                    await Ask(ctx, data, start_index, {"Author": ctx.author}, questions_len-start_index-1, next_=post)
+                except TimeoutError:
+                    await ctx.author.send("Timed out")
 
-                return
         except FileNotFoundError:
             await ctx.author.send("The schema for this question could not be found. Please contact a Moderator and show them this message")
 

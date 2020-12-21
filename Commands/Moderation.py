@@ -15,7 +15,6 @@ class Moderation(commands.Cog):
     @guild_only()
     @has_permissions(manage_messages=True)
     async def clear(self, ctx, amount: Optional[int] = 10):
-        #await ctx.message.delete()
         await ctx.channel.purge(limit=amount)
         message = await ctx.send(f"Cleared the last {amount} messag")
 

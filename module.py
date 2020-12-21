@@ -52,107 +52,29 @@ class user():
             return False
 
 class games():
-    def getSorts(self):
-        r = requests.get("https://games.roblox.com/v1/games/sorts")
-        return r.json()
-
-    def getList(self, sortToken: str, Max_rows: int = 20):
-        r = requests.get(
-            f"https://games.roblox.com/v1/games/list?model.sortToken={sortToken}&model.maxRows={Max_rows}")
-        return r.json()
-
-    def getPopular(self, Max_rows: int = 20):
-        sorts = self.getSorts()["sorts"]
-        token = ""
-        for sort in sorts:
-            if(sort["name"] == "Popular"):
-                token = sort["token"]
-        games_list = self.getList(token, Max_rows)
-        return games_list
-
-    def getIdByName(self, name : str):
-        with open("databases\\game.json", "r") as f:
-            data = json.loads(f.read())
-
-            id = -1
-
-            for game in data["games"]:
-                if(name.lower() in game["aliases"]):
-                    id = game["id"]
-
-            return id
-
-    def getImgUrlById(self, id):
-        url = f"https://thumbnails.roblox.com/v1/assets?assetIds={id}&size=768x432&format=Png&isCircular=false"
-        r = requests.get(url)
-        data = r.json()
-        print(data)
+    def linkGame(self, channel, gameName, gameId, guild__id):
+        database = db("games")
+        data = database.getDb()
         try:
-            return data["data"][0]["imageUrl"]
+            data[str(guild__id)].append({"d_channel":str(channel), "game_name":gameName, "gameId":str(gameId)})
         except:
-            return ""
+            data[str(guild__id)] = []
+            data[str(guild__id)].append({"d_channel":str(channel), "game_name":gameName, "gameId":str(gameId)})
+        db("games").saveDb(data)
 
-    def getNameById(self,id):
-        with open("databases\\game.json", "r") as f:
-            data = json.loads(f.read())
+    def getChannelIdByGameId(self, guild_id, game_id):
+        database = db("games")
+        data = database.getDb()
+        if(links := data[str(guild__id)]):
+            print(links)
 
-            name = ""
-
-            for game in data["games"]:
-                if(id == game["id"]):
-                    return game["name"]
-
-            return name
-
-    def addAliasWithChnId(self, channel_id, alias):
-        with open("databases\\game.json", "r") as f:
-            data = json.loads(f.read())
-            
-            message = "Alias already in list"
-
-            for game in data["games"]:
-                if(game["channel_id"] == channel_id.id):
-                    if(alias not in game["aliases"]):
-                        game["aliases"].append(alias)
-                        message =  "Alias added"
-
-        with open("databases\\game.json", "w") as f:
-            json.dump(data, f)
-            return message
-
-    def getChannelIdByGameId(self, id):
-        if(id == -1):
-            return -1
-            print("invalid id was gived")
-
-        with open("databases\\game.json", "r") as f:
-            data = json.loads(f.read())
-
-            r_id = -1
-
-            for game in data["games"]:
-                if id == game["id"]:
-                    r_id = game["channel_id"]
-        
-            return r_id
-
-    def saveToDB(self, game_id, game_name, channel_id, aliases = []):
-        with open("databases\\game.json", "r") as f:
-            data = json.loads(f.read())
-            data["games"].append({"name":game_name,"id":game_id,"aliases":aliases,"channel_id":channel_id,"posts":[]})
-        
-        with open("databases\\game.json", "w") as f:
-            json.dump(data, f)
-
-    def add_post(self, game_id, post_id):
-        with open("databases\\game.json", "r") as f:
-            data = json.loads(f.read())
-            for game in data["games"]:
-                if(game["id"] == game_id):
-                    game["posts"].append(post_id)
-                    
-        with open("databases\\game.json", "w") as f:
-            json.dump(data, f)
+    def getIdByName(self, guild_id, game_name):
+        guild_id = str(guild_id)
+        print(guild_id)
+        database = db("games")
+        data = database.getDb()
+        if(data[guild__id]):
+            print(links)
 
 class r_user():
     def getUserIdByName(self, name: str):
@@ -194,13 +116,13 @@ class ad():
         time_str = datetime.fromtimestamp(self.timestamp).strftime("%b %d  %I:%M %p")
         
         embed = discord.Embed(title="Play Roblox" , color=discord.Color.from_rgb(254,254,254),url="https://www.roblox.com/games/"+str(self.game_id))
-        embed.add_field(name="**__GAME__**", value=games().getNameById(self.game_id),inline=False)
+        embed.add_field(name="**__GAME__**", value=games(ctx.guild.id).getNameById(self.game_id),inline=False)
         embed.add_field(name="\u200b\n",value=self.event_description,inline=False)
         embed.add_field(name="**__TIME__**",value=time_str,inline=False)
         embed.add_field(name="**__REWARD__**",value="None; Voluntary" if self.reward == 0 else self.reward,inline=False)
         embed.add_field(name="**__CONTACT__**", value='[:roblox:{}](https://web.roblox.com/users/{})\n:discord:{}'.format(self.roblox_name,r_user().getUserIdByName(self.roblox_name),self.discord_usr.mention),inline=False)
         embed.set_thumbnail(url=self.discord_usr.avatar_url)
-        embed.set_image(url=games().getImgUrlById(self.game_id))
+        embed.set_image(url=games(ctx.guild.id).getImgUrlById(self.game_id))
 
         return embed
 
@@ -337,3 +259,5 @@ async def getTicketIdByChannelId(guild,channel_id):
     id = int(id_msg["fields"][0]["value"])
     
     return id
+
+quickEmbed = lambda msg:discord.Emebd(color=discord.Color().from_rgb(254,254,254), description=str(msg))

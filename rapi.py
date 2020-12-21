@@ -1,7 +1,7 @@
 import requests
 
 
-class games():
+class games(ctx.guild.id):
     def getSorts(self):
         r = requests.get("https://games.roblox.com/v1/games/sorts")
         return r.json()
